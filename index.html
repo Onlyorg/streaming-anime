@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WATCHSET - Anime Subtitle Indonesia</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#000;color:#fff;font-family:'Noto Sans',sans-serif;overflow-x:hidden}
+#loading-screen{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity 0.6s ease}
+.spinner{width:36px;height:36px;border:2px solid #222;border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:4px;color:#555}
+nav{display:flex;align-items:center;padding:10px 14px;gap:10px;background:#0d0d0d;border-bottom:0.5px solid #1f1f1f;position:sticky;top:0;z-index:100}
+.hamburger{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:2px 4px}
+.nav-logo{display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;white-space:nowrap}
+.logo-icon{width:28px;height:28px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:13px}
+.search-bar{flex:1;display:flex;align-items:center;gap:8px;background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:20px;padding:6px 12px}
+.search-bar input{background:none;border:none;outline:none;color:#fff;font-size:13px;width:100%}
+.search-bar input::placeholder{color:#555}
+.btn-login{background:none;border:0.5px solid #444;color:#fff;padding:5px 14px;border-radius:20px;font-size:12px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600}
+.heart-icon{color:#ff3333;font-size:18px;cursor:pointer}
+.sidebar{position:fixed;inset:0;z-index:200;display:none}
+.sidebar-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.75)}
+.sidebar-panel{position:absolute;left:0;top:0;bottom:0;width:250px;background:#0d0d0d;border-right:0.5px solid #1f1f1f;animation:slideIn 0.25s ease}
+@keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+.sidebar-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:0.5px solid #1f1f1f;margin-bottom:6px}
+.sidebar-logo{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px}
+.sidebar-close{background:none;border:none;color:#888;font-size:22px;cursor:pointer}
+.sidebar-item{padding:13px 16px;font-size:13px;display:flex;align-items:center;gap:12px;cursor:pointer;color:#aaa;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:0.5px}
+.sidebar-item:hover{background:#1a1a1a;color:#fff}
+.sidebar-community{margin:8px 14px;background:#0d2200;border:0.5px solid #2a5500;color:#55cc22;padding:11px 14px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-weight:600}
+.sidebar-donate{margin:6px 14px;background:#2a1000;border:0.5px solid #662200;color:#ff6622;padding:11px 14px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-weight:600}
+.hero{position:relative;background:#0d0d0d;padding:20px 16px 22px;margin-bottom:3px;min-height:200px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(8px) brightness(0.3)}
+.hero-content{position:relative;z-index:1}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.hero-badges{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.rank-badge{background:rgba(0,0,0,0.6);border:0.5px solid #333;border-radius:6px;padding:4px 8px;text-align:center}
+.rank-label{font-size:8px;color:#666;font-family:'Rajdhani',sans-serif;letter-spacing:1px;display:block}
+.rank-num{font-size:15px;font-weight:700;color:#fff;font-family:'Rajdhani',sans-serif;line-height:1.1}
+.trending-badge{background:rgba(26,0,0,0.8);border:0.5px solid #550000;border-radius:20px;padding:3px 9px;font-size:10px;color:#ff5555;font-family:'Rajdhani',sans-serif;font-weight:600}
+.hero-title{font-size:20px;font-weight:700;line-height:1.2;margin-bottom:6px;font-family:'Rajdhani',sans-serif}
+.hero-subtitle{font-size:11px;color:#aaa;margin-bottom:14px}
+.btn-detail{background:rgba(255,255,255,0.15);border:0.5px solid rgba(255,255,255,0.3);color:#fff;padding:8px 20px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:1px}
+.hero-dots{display:flex;gap:5px;margin-top:16px}
+.dot{height:3px;background:#2a2a2a;border-radius:2px;width:16px;transition:all 0.3s}
+.dot.active{background:#fff;width:26px}
+.support-banner{background:#0d0d0d;border-top:0.5px solid #1f1f1f;border-bottom:0.5px solid #1f1f1f;padding:16px 14px;text-align:center;margin-bottom:3px}
+.support-banner p{font-size:13px;font-weight:500;margin-bottom:12px;line-height:1.6;color:#ccc}
+.support-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn-donate{background:#2a1000;border:0.5px solid #662200;color:#ff6622;padding:8px 18px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600}
+.btn-community{background:#0d2200;border:0.5px solid #2a5500;color:#55cc22;padding:8px 18px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600}
+.section{padding:14px}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.section-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;letter-spacing:1px}
+.section-title::before{content:'';display:block;width:3px;height:16px;background:#fff;border-radius:2px}
+.see-all{font-size:11px;color:#666;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600}
+.anime-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.anime-card{background:#0d0d0d;border-radius:8px;overflow:hidden;cursor:pointer;transition:transform 0.2s}
+.anime-card:hover{transform:scale(1.03)}
+.anime-thumb{aspect-ratio:3/4;background:#111;position:relative;overflow:hidden}
+.anime-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.anime-thumb-gradient{position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,0.9) 100%)}
+.badge-new{position:absolute;top:4px;left:4px;background:#2244ee;color:#fff;font-size:8px;padding:2px 5px;border-radius:3px;font-family:'Rajdhani',sans-serif;font-weight:700}
+.badge-ep{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.85);color:#888;font-size:8px;padding:2px 5px;border-radius:3px;font-family:'Rajdhani',sans-serif;font-weight:600}
+.anime-info{padding:6px 5px 7px}
+.anime-name{font-size:10px;color:#bbb;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tabs{display:flex;gap:0;border-bottom:0.5px solid #1f1f1f;margin-bottom:0}
+.tab{flex:1;padding:10px;text-align:center;font-size:12px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:0.5px;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s}
+.tab.active{color:#fff;border-bottom-color:#fff}
+.skeleton{background:linear-gradient(90deg,#111 25%,#1a1a1a 50%,#111 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.search-results{padding:14px;display:none}
+.search-results.active{display:block}
+.no-result{text-align:center;padding:40px 20px;color:#555;font-size:13px}
+@media(max-width:400px){.anime-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* Detail Page */
+#detail-page{display:none;position:fixed;inset:0;background:#000;z-index:150;overflow-y:auto}
+.detail-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#0d0d0d;border-bottom:0.5px solid #1f1f1f;position:sticky;top:0;z-index:10}
+.btn-back{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+.detail-title-nav{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail-hero{position:relative;min-height:220px;overflow:hidden}
+.detail-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(10px) brightness(0.25)}
+.detail-hero-content{position:relative;z-index:1;display:flex;gap:14px;padding:16px 14px}
+.detail-poster{width:100px;height:150px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#111}
+.detail-info{flex:1}
+.detail-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;line-height:1.2;margin-bottom:8px}
+.detail-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.badge-genre{background:#1a1a1a;border:0.5px solid #333;border-radius:20px;padding:3px 8px;font-size:10px;color:#aaa}
+.detail-desc{font-size:12px;color:#888;line-height:1.6;padding:14px;border-bottom:0.5px solid #1f1f1f}
+.episode-list{padding:14px}
+.episode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.ep-btn{background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:6px;padding:8px 4px;text-align:center;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;transition:background 0.2s;color:#ccc}
+.ep-btn:hover{background:#252525;color:#fff}
+
+/* Player Page */
+#player-page{display:none;position:fixed;inset:0;background:#000;z-index:160;overflow-y:auto}
+.player-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#0d0d0d;border-bottom:0.5px solid #1f1f1f;position:sticky;top:0;z-index:10}
+.video-container{width:100%;background:#000;position:relative}
+.video-container iframe{width:100%;height:220px;border:none;display:block}
+.player-info{padding:14px}
+.player-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px}
+.mirror-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.mirror-btn{background:#1a1a1a;border:0.5px solid #333;border-radius:6px;padding:7px 14px;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;color:#aaa;transition:all 0.2s}
+.mirror-btn.active{background:#fff;color:#000;border-color:#fff}
+</style>
+</head>
+<body>
+
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <div class="loading-text">LOADING ANIME...</div>
+</div>
+
+<div id="main-app" style="display:none">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <div class="sidebar-panel">
+      <div class="sidebar-header">
+        <span class="sidebar-logo">WATCHSET</span>
+        <button class="sidebar-close" onclick="closeSidebar()">×</button>
+      </div>
+      <div class="sidebar-item" onclick="showHome();closeSidebar()">🏠 HOME</div>
+      <div class="sidebar-item">🔔 NOTIFICATIONS</div>
+      <div class="sidebar-item">💬 WATCH SOCIAL <span style="background:#2244ff;color:#fff;font-size:9px;padding:2px 7px;border-radius:3px;margin-left:auto">NEW</span></div>
+      <button class="sidebar-community">👥 JOIN COMMUNITY</button>
+      <button class="sidebar-donate">❤️ DONATE</button>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav>
+    <button class="hamburger" onclick="openSidebar()">☰</button>
+    <div class="nav-logo">
+      <div class="logo-icon">W</div>
+      WATCHSET
+    </div>
+    <div class="search-bar">
+      <span style="color:#555;font-size:14px">🔍</span>
+      <input type="text" placeholder="Search anime..." id="search-input" oninput="handleSearch(this.value)">
+    </div>
+    <div class="nav-actions">
+      <span class="heart-icon">♥</span>
+      <button class="btn-login">LOGIN</button>
+    </div>
+  </nav>
+
+  <!-- Home Content -->
+  <div id="home-content">
+    <!-- Hero -->
+    <div class="hero" id="hero-section">
+      <div class="hero-bg" id="hero-bg"></div>
+      <div class="hero-content">
+        <div class="hero-top">
+          <div class="hero-badges">
+            <div class="rank-badge">
+              <span class="rank-label">RANK</span>
+              <span class="rank-num">#1</span>
+            </div>
+            <div class="trending-badge">↑ TRENDING</div>
+          </div>
+        </div>
+        <div class="hero-title" id="hero-title">Loading...</div>
+        <div class="hero-subtitle" id="hero-subtitle"></div>
+        <button class="btn-detail" id="hero-btn" onclick="handleHeroClick()">▶ DETAIL ANIME</button>
+        <div class="hero-dots" id="hero-dots"></div>
+      </div>
+    </div>
+
+    <!-- Support Banner -->
+    <div class="support-banner">
+      <p>Bantu Dukung Kami Agar Bisa Terus Memberikan<br>Update Anime Terbaru 😸</p>
+      <div class="support-btns">
+        <button class="btn-donate">DONASI SEKARANG</button>
+        <button class="btn-community">JOIN COMMUNITY</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('latest', this)">TERBARU</div>
+      <div class="tab" onclick="switchTab('popular', this)">POPULER</div>
+      <div class="tab" onclick="switchTab('movie', this)">MOVIE</div>
+    </div>
+
+    <!-- Anime Grid -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title" id="section-label">NEW UPDATE ANIME</div>
+        <span class="see-all">Lihat Semua</span>
+      </div>
+      <div class="anime-grid" id="anime-grid"></div>
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  <div class="search-results" id="search-results">
+    <div class="section-header">
+      <div class="section-title">HASIL PENCARIAN</div>
+    </div>
+    <div class="anime-grid" id="search-grid"></div>
+  </div>
+</div>
+
+<!-- Detail Page -->
+<div id="detail-page">
+  <div class="detail-header">
+    <button class="btn-back" onclick="closeDetail()">←</button>
+    <span class="detail-title-nav" id="detail-title-nav">Detail Anime</span>
+  </div>
+  <div class="detail-hero">
+    <div class="detail-hero-bg" id="detail-bg"></div>
+    <div class="detail-hero-content">
+      <img class="detail-poster" id="detail-poster" src="" alt="">
+      <div class="detail-info">
+        <div class="detail-name" id="detail-name"></div>
+        <div class="detail-badges" id="detail-genres"></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-desc" id="detail-desc"></div>
+  <div class="episode-list">
+    <div class="section-title" style="margin-bottom:10px">DAFTAR EPISODE</div>
+    <div class="episode-grid" id="episode-grid"></div>
+  </div>
+</div>
+
+<!-- Player Page -->
+<div id="player-page">
+  <div class="player-header">
+    <button class="btn-back" onclick="closePlayer()">←</button>
+    <span class="detail-title-nav" id="player-title-nav">Nonton Anime</span>
+  </div>
+  <div class="video-container">
+    <iframe id="video-frame" allowfullscreen></iframe>
+  </div>
+  <div class="player-info">
+    <div class="player-title" id="player-title"></div>
+    <div style="font-size:12px;color:#666;margin-bottom:10px">Pilih Mirror:</div>
+    <div class="mirror-list" id="mirror-list"></div>
+  </div>
+</div>
+
+<script>
+const API = 'https://kumanime-api-red.vercel.app';
+let heroAnimes = [];
+let currentHeroIndex = 0;
+let heroInterval;
+let currentDetailSlug = '';
+
+// Fetch helpers
+async function fetchAPI(endpoint) {
+  const res = await fetch(API + endpoint);
+  return res.json();
+}
+
+// Render anime card
+function renderCard(anime) {
+  const slug = anime.slug || anime.endpoint || '';
+  const title = anime.title || anime.judul || 'Unknown';
+  const thumb = anime.thumbnail || anime.cover || anime.image || '';
+  const ep = anime.episode || anime.latest_episode || '';
+  return `<div class="anime-card" onclick="openDetail('${slug.replace(/'/g,"\\'")}','${title.replace(/'/g,"\\'").replace(/"/g,'\\"')}')">
+    <div class="anime-thumb">
+      ${thumb ? `<img src="${thumb}" alt="${title}" loading="lazy" onerror="this.style.display='none'">` : '<div style="width:100%;height:100%;background:#1a1a1a"></div>'}
+      <div class="anime-thumb-gradient"></div>
+      <span class="badge-new">TERBARU</span>
+      ${ep ? `<span class="badge-ep">${ep}</span>` : ''}
+    </div>
+    <div class="anime-info">
+      <div class="anime-name">${title}</div>
+    </div>
+  </div>`;
+}
+
+// Load latest anime
+async function loadLatest() {
+  const grid = document.getElementById('anime-grid');
+  grid.innerHTML = Array(8).fill(`<div class="anime-card"><div class="anime-thumb skeleton"></div><div style="padding:6px 5px"><div class="skeleton" style="height:10px;border-radius:4px;margin-bottom:4px"></div><div class="skeleton" style="height:10px;border-radius:4px;width:70%"></div></div></div>`).join('');
+  try {
+    const data = await fetchAPI('/latest');
+    const animes = data.data || data.animeList || data || [];
+    heroAnimes = animes.slice(0, 7);
+    updateHero(0);
+    startHeroSlider();
+    grid.innerHTML = animes.map(renderCard).join('');
+  } catch(e) {
+    grid.innerHTML = '<div class="no-result" style="grid-column:1/-1">Gagal memuat anime 😢</div>';
+  }
+}
+
+async function loadPopular() {
+  const grid = document.getElementById('anime-grid');
+  grid.innerHTML = Array(8).fill(`<div class="anime-card"><div class="anime-thumb skeleton"></div></div>`).join('');
+  try {
+    const data = await fetchAPI('/popular');
+    const animes = data.data || data.animeList || data || [];
+    grid.innerHTML = animes.map(renderCard).join('');
+  } catch(e) {
+    grid.innerHTML = '<div class="no-result" style="grid-column:1/-1">Gagal memuat 😢</div>';
+  }
+}
+
+async function loadMovie() {
+  const grid = document.getElementById('anime-grid');
+  grid.innerHTML = Array(8).fill(`<div class="anime-card"><div class="anime-thumb skeleton"></div></div>`).join('');
+  try {
+    const data = await fetchAPI('/movie/page/1');
+    const animes = data.data || data.animeList || data || [];
+    grid.innerHTML = animes.map(renderCard).join('');
+  } catch(e) {
+    grid.innerHTML = '<div class="no-result" style="grid-column:1/-1">Gagal memuat 😢</div>';
+  }
+}
+
+// Hero slider
+function updateHero(index) {
+  if (!heroAnimes.length) return;
+  const a = heroAnimes[index];
+  const title = a.title || a.judul || '';
+  const thumb = a.thumbnail || a.cover || a.image || '';
+  const slug = a.slug || a.endpoint || '';
+  document.getElementById('hero-title').textContent = title;
+  document.getElementById('hero-subtitle').textContent = a.episode || a.genre || '';
+  if (thumb) document.getElementById('hero-bg').style.backgroundImage = `url('${thumb}')`;
+  document.getElementById('hero-btn').dataset.slug = slug;
+  document.getElementById('hero-btn').dataset.title = title;
+  // dots
+  const dots = document.getElementById('hero-dots');
+  dots.innerHTML = heroAnimes.map((_,i) => `<div class="dot ${i===index?'active':''}"></div>`).join('');
+  currentHeroIndex = index;
+}
+
+function handleHeroClick() {
+  const btn = document.getElementById('hero-btn');
+  openDetail(btn.dataset.slug, btn.dataset.title);
+}
+
+function startHeroSlider() {
+  clearInterval(heroInterval);
+  heroInterval = setInterval(() => {
+    updateHero((currentHeroIndex + 1) % heroAnimes.length);
+  }, 4000);
+}
+
+// Tabs
+function switchTab(type, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const labels = {latest:'NEW UPDATE ANIME', popular:'ANIME POPULER', movie:'ANIME MOVIE'};
+  document.getElementById('section-label').textContent = labels[type];
+  if (type === 'latest') loadLatest();
+  else if (type === 'popular') loadPopular();
+  else loadMovie();
+}
+
+// Search
+let searchTimeout;
+async function handleSearch(q) {
+  const homeContent = document.getElementById('home-content');
+  const searchResults = document.getElementById('search-results');
+  if (!q.trim()) {
+    homeContent.style.display = 'block';
+    searchResults.classList.remove('active');
+    return;
+  }
+  homeContent.style.display = 'none';
+  searchResults.classList.add('active');
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(async () => {
+    const grid = document.getElementById('search-grid');
+    grid.innerHTML = Array(4).fill(`<div class="anime-card"><div class="anime-thumb skeleton"></div></div>`).join('');
+    try {
+      const data = await fetchAPI('/search/' + encodeURIComponent(q));
+      const animes = data.data || data.animeList || data || [];
+      if (!animes.length) {
+        grid.innerHTML = '<div class="no-result" style="grid-column:1/-1">Anime tidak ditemukan 😢</div>';
+      } else {
+        grid.innerHTML = animes.map(renderCard).join('');
+      }
+    } catch(e) {
+      grid.innerHTML = '<div class="no-result" style="grid-column:1/-1">Gagal mencari 😢</div>';
+    }
+  }, 600);
+}
+
+// Detail page
+async function openDetail(slug, title) {
+  if (!slug) return;
+  currentDetailSlug = slug;
+  const page = document.getElementById('detail-page');
+  page.style.display = 'block';
+  document.getElementById('detail-title-nav').textContent = title || 'Detail Anime';
+  document.getElementById('detail-name').textContent = title || '';
+  document.getElementById('detail-genres').innerHTML = '<span style="color:#555;font-size:11px">Memuat detail...</span>';
+  document.getElementById('detail-desc').textContent = 'Memuat deskripsi...';
+  document.getElementById('episode-grid').innerHTML = Array(8).fill(`<div class="ep-btn skeleton" style="height:36px"></div>`).join('');
+  try {
+    const data = await fetchAPI('/anime/' + slug);
+    const d = data.data || data || {};
+    const poster = d.thumbnail || d.cover || d.image || '';
+    if (poster) {
+      document.getElementById('detail-poster').src = poster;
+      document.getElementById('detail-bg').style.backgroundImage = `url('${poster}')`;
+    }
+    document.getElementById('detail-name').textContent = d.title || d.judul || title;
+    document.getElementById('detail-title-nav').textContent = d.title || d.judul || title;
+    const genres = d.genres || d.genre || [];
+    document.getElementById('detail-genres').innerHTML = (Array.isArray(genres) ? genres : [genres]).map(g => `<span class="badge-genre">${g}</span>`).join('');
+    document.getElementById('detail-desc').textContent = d.synopsis || d.description || d.sinopsis || 'Tidak ada deskripsi.';
+    const episodes = d.episodes || d.episode_list || [];
+    if (episodes.length) {
+      document.getElementById('episode-grid').innerHTML = episodes.map(ep => {
+        const epSlug = ep.slug || ep.endpoint || ep.url || '';
+        const epNum = ep.episode || ep.number || ep.title || ep;
+        return `<div class="ep-btn" onclick="openPlayer('${epSlug.replace(/'/g,"\\'")}','${String(epNum).replace(/'/g,"\\'")}','${(d.title||title).replace(/'/g,"\\'")}')">${epNum}</div>`;
+      }).join('');
+    } else {
+      document.getElementById('episode-grid').innerHTML = '<div style="color:#555;font-size:12px;grid-column:1/-1">Episode tidak tersedia</div>';
+    }
+  } catch(e) {
+    document.getElementById('detail-desc').textContent = 'Gagal memuat detail anime.';
+  }
+}
+
+function closeDetail() {
+  document.getElementById('detail-page').style.display = 'none';
+}
+
+// Player
+async function openPlayer(slug, epNum, animeTitle) {
+  if (!slug) return;
+  const page = document.getElementById('player-page');
+  page.style.display = 'block';
+  document.getElementById('player-title').textContent = `${animeTitle} - Episode ${epNum}`;
+  document.getElementById('player-title-nav').textContent = `Episode ${epNum}`;
+  document.getElementById('mirror-list').innerHTML = '<span style="color:#555;font-size:12px">Memuat mirror...</span>';
+  document.getElementById('video-frame').src = '';
+  try {
+    const data = await fetchAPI('/episode/' + slug);
+    const d = data.data || data || {};
+    const mirrors = d.mirrors || d.streaming || d.links || [];
+    if (mirrors.length) {
+      document.getElementById('mirror-list').innerHTML = mirrors.map((m, i) => {
+        const url = m.url || m.link || m.src || m;
+        const label = m.quality || m.server || m.name || `Mirror ${i+1}`;
+        return `<button class="mirror-btn ${i===0?'active':''}" onclick="setMirror(this,'${url.replace(/'/g,"\\'")}','${label}')">${label}</button>`;
+      }).join('');
+      const firstUrl = mirrors[0].url || mirrors[0].link || mirrors[0].src || mirrors[0];
+      document.getElementById('video-frame').src = firstUrl;
+    } else {
+      document.getElementById('mirror-list').innerHTML = '<span style="color:#555;font-size:12px">Mirror tidak tersedia</span>';
+    }
+  } catch(e) {
+    document.getElementById('mirror-list').innerHTML = '<span style="color:#555;font-size:12px">Gagal memuat mirror</span>';
+  }
+}
+
+function setMirror(btn, url, label) {
+  document.querySelectorAll('.mirror-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('video-frame').src = url;
+}
+
+function closePlayer() {
+  document.getElementById('player-page').style.display = 'none';
+  document.getElementById('video-frame').src = '';
+}
+
+function showHome() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('home-content').style.display = 'block';
+  document.getElementById('search-results').classList.remove('active');
+}
+
+function openSidebar(){document.getElementById('sidebar').style.display='block'}
+function closeSidebar(){document.getElementById('sidebar').style.display='none'}
+
+// Init
+window.addEventListener('load', async () => {
+  await loadLatest();
+  setTimeout(() => {
+    const ls = document.getElementById('loading-screen');
+    ls.style.opacity = '0';
+    setTimeout(() => {
+      ls.style.display = 'none';
+      document.getElementById('main-app').style.display = 'block';
+    }, 600);
+  }, 1800);
+});
+</script>
+</body>
+</html>
