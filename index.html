@@ -246,7 +246,7 @@ nav{display:flex;align-items:center;padding:10px 14px;gap:10px;background:#0d0d0
 </div>
 
 <script>
-const API = 'https://kumanime-api-red.vercel.app';
+const API = 'https://api.sankavollerei.com';
 let heroAnimes = [];
 let currentHeroIndex = 0;
 let heroInterval;
@@ -282,8 +282,8 @@ async function loadLatest() {
   const grid = document.getElementById('anime-grid');
   grid.innerHTML = Array(8).fill(`<div class="anime-card"><div class="anime-thumb skeleton"></div><div style="padding:6px 5px"><div class="skeleton" style="height:10px;border-radius:4px;margin-bottom:4px"></div><div class="skeleton" style="height:10px;border-radius:4px;width:70%"></div></div></div>`).join('');
   try {
-    const data = await fetchAPI('/latest');
-    const animes = data.data || data.animeList || data || [];
+    const data = await fetchAPI('/otakudesu/ongoing?page=1');
+    const animes = (data.data && data.data.animeList) || data.animeList || data.data || data || [];
     heroAnimes = animes.slice(0, 7);
     updateHero(0);
     startHeroSlider();
@@ -297,8 +297,8 @@ async function loadPopular() {
   const grid = document.getElementById('anime-grid');
   grid.innerHTML = Array(8).fill(`<div class="anime-card"><div class="anime-thumb skeleton"></div></div>`).join('');
   try {
-    const data = await fetchAPI('/popular');
-    const animes = data.data || data.animeList || data || [];
+    const data = await fetchAPI('/otakudesu/completed?page=1');
+    const animes = (data.data && data.data.animeList) || data.animeList || data.data || data || [];
     grid.innerHTML = animes.map(renderCard).join('');
   } catch(e) {
     grid.innerHTML = '<div class="no-result" style="grid-column:1/-1">Gagal memuat 😢</div>';
@@ -309,8 +309,8 @@ async function loadMovie() {
   const grid = document.getElementById('anime-grid');
   grid.innerHTML = Array(8).fill(`<div class="anime-card"><div class="anime-thumb skeleton"></div></div>`).join('');
   try {
-    const data = await fetchAPI('/movie/page/1');
-    const animes = data.data || data.animeList || data || [];
+    const data = await fetchAPI('/otakudesu/ongoing?page=2');
+    const animes = (data.data && data.data.animeList) || data.animeList || data.data || data || [];
     grid.innerHTML = animes.map(renderCard).join('');
   } catch(e) {
     grid.innerHTML = '<div class="no-result" style="grid-column:1/-1">Gagal memuat 😢</div>';
@@ -375,8 +375,8 @@ async function handleSearch(q) {
     const grid = document.getElementById('search-grid');
     grid.innerHTML = Array(4).fill(`<div class="anime-card"><div class="anime-thumb skeleton"></div></div>`).join('');
     try {
-      const data = await fetchAPI('/search/' + encodeURIComponent(q));
-      const animes = data.data || data.animeList || data || [];
+      const data = await fetchAPI('/otakudesu/search?query=' + encodeURIComponent(q));
+      const animes = (data.data && data.data.animeList) || data.animeList || data.data || data || [];
       if (!animes.length) {
         grid.innerHTML = '<div class="no-result" style="grid-column:1/-1">Anime tidak ditemukan 😢</div>';
       } else {
@@ -400,7 +400,7 @@ async function openDetail(slug, title) {
   document.getElementById('detail-desc').textContent = 'Memuat deskripsi...';
   document.getElementById('episode-grid').innerHTML = Array(8).fill(`<div class="ep-btn skeleton" style="height:36px"></div>`).join('');
   try {
-    const data = await fetchAPI('/anime/' + slug);
+    const data = await fetchAPI('/otakudesu/anime/' + slug);
     const d = data.data || data || {};
     const poster = d.thumbnail || d.cover || d.image || '';
     if (poster) {
@@ -441,7 +441,7 @@ async function openPlayer(slug, epNum, animeTitle) {
   document.getElementById('mirror-list').innerHTML = '<span style="color:#555;font-size:12px">Memuat mirror...</span>';
   document.getElementById('video-frame').src = '';
   try {
-    const data = await fetchAPI('/episode/' + slug);
+    const data = await fetchAPI('/otakudesu/episode/' + slug);
     const d = data.data || data || {};
     const mirrors = d.mirrors || d.streaming || d.links || [];
     if (mirrors.length) {
